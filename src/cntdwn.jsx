@@ -1,4 +1,4 @@
-import React, {Component, PropTypes} from 'react'
+import React, {Component} from 'react'
 import moment from 'moment'
 
 const COUNTDOWN_NOT_STARTED = 1
@@ -13,9 +13,13 @@ export default class Countdown extends Component {
       status: COUNTDOWN_NOT_STARTED,
       intervalId: null
     }
+    this.addLeadingZero = this.addLeadingZero.bind(this)
+    this.calculateRemainingTime = this.calculateRemainingTime.bind(this)
+    this.renderRemainingTime = this.renderRemainingTime.bind(this)
+    this.tick = this.tick.bind(this)
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     setTimeout(() => {
       let timer = setInterval(() => {
         this.tick()
@@ -30,22 +34,22 @@ export default class Countdown extends Component {
     }, this.props.startDelay)
   }
 
-  componentWillUnmount = () => {
+  componentWillUnmount() {
     clearInterval(this.state.intervalId)
   }
 
-  calculateRemainingTime = () => {
+  calculateRemainingTime() {
     return -1 * moment().diff(this.props.targetDate)
   }
 
-  addLeadingZero = (value) => {
+  addLeadingZero(value) {
     if (value < 10) {
       return '0' + value.toString()
     }
     return value
   }
 
-  tick = () => {
+  tick() {
     this.setState({
       remainingTime: this.calculateRemainingTime()
     })
@@ -62,13 +66,13 @@ export default class Countdown extends Component {
     }
   }
 
-  renderRemainingTime = () => {
+  renderRemainingTime() {
     let html = []
     let { format, leadingZero, timeSeparator } = this.props
     let { remainingTime } = this.state
 
     if (format.day) {
-      let days = moment.duration(remainingTime).get('days')
+      let days = Math.floor(moment.duration(remainingTime).as('days'))
       if (leadingZero) {
         days = this.addLeadingZero(days)
       }
@@ -118,7 +122,7 @@ export default class Countdown extends Component {
     return html
   }
 
-  render = () => {
+  render() {
     if (this.state.status === COUNTDOWN_NOT_STARTED) {
       return (
         <span></span>
@@ -130,16 +134,6 @@ export default class Countdown extends Component {
       </div>
     )
   }
-}
-
-Countdown.propTypes = {
-  targetDate: PropTypes.instanceOf(Date).isRequired,
-  interval: PropTypes.number,
-  startDelay: PropTypes.number,
-  onFinished: PropTypes.func,
-  format: PropTypes.object,
-  timeSeparator: PropTypes.string,
-  leadingZero: PropTypes.bool
 }
 
 Countdown.defaultProps = {
